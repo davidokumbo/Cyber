@@ -171,7 +171,7 @@ const Contact = () => {
                     <div>
                       <h3 className="font-medium">Email Us</h3>
                       <a href="mailto:contact@cyberdocs.com" className="text-muted-foreground hover:text-primary transition-all-ease">
-                        contact@cyberdocs.com
+                        cyberkendos@gmail.com
                       </a>
                     </div>
                   </div>
@@ -181,7 +181,7 @@ const Contact = () => {
                     <div>
                       <h3 className="font-medium">Call Us</h3>
                       <a href="tel:+1234567890" className="text-muted-foreground hover:text-primary transition-all-ease">
-                        +254712345678
+                        +254710806049
                       </a>
                     </div>
                   </div>
@@ -191,6 +191,7 @@ const Contact = () => {
                     <div>
                       <h3 className="font-medium">Visit Us</h3>
                       <address className="text-muted-foreground not-italic">
+                       Kawangware Near Penda Medical Center,
                         Nairobi, Kenya
                       </address>
                     </div>
