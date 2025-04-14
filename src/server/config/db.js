@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
@@ -13,6 +14,9 @@ export const createDatabase = async () => {
       host: process.env.DB_HOST || 'localhost',
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
+      ssl: {
+        rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true'
+      }
     });
     
     console.log('Checking if database exists...');
@@ -33,7 +37,10 @@ export const pool = mysql.createPool({
   database: DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true'
+  }
 });
 
 // Initialize database with tables
@@ -104,6 +111,18 @@ export const initDb = async () => {
       )
     `);
     
+    // Create password_reset_tokens table if not exists
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        token VARCHAR(255) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+    
     // Check if preview_text column exists in documents table, add it if it doesn't
     try {
       // Try to select using preview_text column to test if it exists
@@ -134,11 +153,15 @@ export const initDb = async () => {
       if (adminRows.length === 0) {
         // Use default admin credentials if not in .env
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@whizmo.com';
-        const adminPassword = process.env.ADMIN_PASSWORD || '$2a$10$QrRzR2ZbKZJ4.A5OdMoHe.eN1UJ3L7n4NpB.oMTa.NdDIqYzUj2im'; // hashed 'admin123'
+        const adminPassword = process.env.ADMIN_PASSWORD || '123456';
+        
+        // Hash the admin password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(adminPassword, salt);
         
         await connection.execute(
           'INSERT INTO users (email, password, role) VALUES (?, ?, ?)',
-          [adminEmail, adminPassword, 'admin']
+          [adminEmail, hashedPassword, 'admin']
         );
         
         console.log(`Default admin user created: ${adminEmail}`);
