@@ -31,15 +31,15 @@ export const createDatabase = async () => {
 
 // Create connection pool
 export const pool = mysql.createPool({
-  host:'cyberdocs-mysql.mysql.database.azure.com',
-  user:'Okumbo',
-  password:'Asikoye1234',
-  database:'document_system',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true'
   }
 });
 
