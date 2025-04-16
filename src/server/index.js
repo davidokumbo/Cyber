@@ -9,13 +9,6 @@ import servicesRoutes from './routes/serviceRoutes.js';
 import documentsRoutes from './routes/documentRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 
-// Added for frontend
-const staticPath = path.join(__dirname, '../server/dist'); // adjust path
-app.use(express.static(staticPath));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(staticPath, 'index.html'));
-});
 
 
 // ES Module compatibility for __dirname
